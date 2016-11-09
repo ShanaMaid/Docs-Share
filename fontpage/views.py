@@ -64,6 +64,8 @@ def login(request):
 			return render(request,'fontpage/index.html',{'account':u_account})
 		except Exception as e:
 			return render(request,'fontpage/login.html',{'error':'error','account':u_account,'password':u_password})
+	if request.method=='GET':
+		return render(request,'fontpage/login.html')
 
 def logout(request):
 	del request.session['u_account']

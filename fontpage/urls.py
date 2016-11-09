@@ -14,4 +14,5 @@ urlpatterns=[
 	url(r'^removeGroup/$',views.removeGroup,name='logout'),
 	url(r'^getGroup/$',views.getGroup,name='logout'),
 	url(r'^checkRole/$',views.checkRole,name='logout'),
+	url(r'^pCenter/$',views.pCenter,name='pCenter'),
 ]
