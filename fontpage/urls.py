@@ -13,6 +13,8 @@ urlpatterns=[
 	url(r'^addGroup/$',views.addGroup,name='addGroup'),
 	url(r'^removeGroup/$',views.removeGroup,name='removeGroup'),
 	url(r'^getGroup/$',views.getGroup,name='getGroup'),
-	url(r'^checkRole/(^$)$',views.checkRole,name='checkRole'),
-	url(r'^clients/$',views.clients,name='clients')
+	url(r'^checkRole/(^.*$)$',views.checkRole,name='checkRole'),
+	url(r'^clients/$',views.clients,name='clients'),
+	url(r'^getSubmitPage/$',views.getSubmitPage,name='getSubmitPage'),
+	url(r'^getPersonInfo/$',views.getPersonInfo,name='getPersonInfo')
 ]

@@ -203,19 +203,58 @@ def removeGroup(request):
 		return JsonResponse(result)
 
 def getGroup(request):
+	result={}
 	group_result=Usergroup.objects.all()
-	return JsonResponse(group_result);
+	result['ret_code']=0
+	result['group_result']=group_result
+	result['ret_msg']=''
+	return JsonResponse(result);
 
 def checkRole(request,u_account):
+	result={}
 	try:
 		role=Roletable.objects.get(usertable__u_account=u_account)
-		return role.r_type
+		result['ret_code']=0
+		result['r_type']=role.r_type
+		result['ret_msg']=''
 	except Exception as e:
-		return e
+		result['ret_code']=-1
+		result['ret_msg']=e
+	finally:
+		return JsonResponse(result)
 def clients(request):
 	if 'u_account' in request.session:
 		return render(request,'fontpage/clients.html',{"u_account":request.session['u_account']})
 	else:
 		return render(request,'fontpage/login.html')
 		
+def test(request):
+	return render(request,'fontpage/test.html')
 		
+
+def getSubmitPage(request):
+	result={}
+	if request.method=='GET':
+		content=Article.objects.filter(a_issee=False)
+	 	result['ret_code']=0
+	 	result['content']=content
+	 	result['ret_msg']=''
+	else:
+	 	result['ret_code']=-1
+	 	result['ret_msg']="error"
+	return JsonResponse(result)
+def getPersonInfo(request):
+	result={}
+	if request.method=='POST':
+		u_account=request.POST.get("u_account");
+		try:
+			personInfo=Usertable.objects.get(u_account=u_account);
+			result['ret_code']=0
+			result['personInfo']=personInfo
+			result['ret_msg']=''
+		except Exception as e:
+			result['ret_code']=-1
+			result['ret_msg']=e
+	else:
+	 	pass
+	return JsonResponse(result)
