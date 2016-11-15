@@ -10,8 +10,17 @@ def index(request):
 	#return render(request,'fontpage/index2.html')
 
 def adminIndex(request,message):
-	if bool(request.session['u_account']):
-		return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message})
+	if request.session.get('u_account',False):
+		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account']);
+		if log_type=='manager':
+			pageList=getSubmitPage(request)
+			personList=PersonList(request,log_type)
+			return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList})
+		elif log_type=='headman':
+			personList=PersonList(request,log_type)
+			return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message,'personList':personList})
+		else:
+			return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message})
 	else:
 		return render(request,'fontpage/login.html')
 
@@ -58,12 +67,10 @@ def addArticle(request):
 		except Exception as e:
 			result['ret_code']=-1
 			result['ret_msg']=e
-		finally:
-			adminIndex(request,result)
 	else:
 		result['ret_code']=-2
 		result['ret_msg']="illegal"
-		adminIndex(request,result)
+	return JsonResponse(result)
 
 def login(request):
 	if request.method=='POST':
@@ -132,12 +139,10 @@ def addUser(request):
 		except Exception as e:
 			result['ret_code']=-1
 			result['ret_msg']=e
-		finally:
-			adminIndex(request,result)
 	else:
 		result['ret_code']=-2
 		result['ret_msg']="illegal"
-		adminIndex(request,result)
+	return JsonResponse(result)
 
 def removeUser(request):
 	result={}
@@ -233,15 +238,10 @@ def test(request):
 		
 
 def getSubmitPage(request):
-	result={}
-	if request.method=='GET':
-		content=Article.objects.filter(a_issee=False)
-	 	result['ret_code']=0
-	 	result['content']=content
-	 	result['ret_msg']=''
-	else:
-	 	result['ret_code']=-1
-	 	result['ret_msg']="error"
+	content=Article.objects.filter(a_issee=False)
+	result['ret_code']=0
+	result['content']=content
+	result['ret_msg']=''
 	return JsonResponse(result)
 def getPersonInfo(request):
 	result={}
@@ -257,4 +257,13 @@ def getPersonInfo(request):
 			result['ret_msg']=e
 	else:
 	 	pass
+	return JsonResponse(result)
+def PersonList(request,r_type):
+	if r_type=='manager':
+		content=Usertable.objects.filter(roletable__r_type="headman")
+	elif: r_type=='headman':
+		content=Usertable.objects.filter(roletable__r_type="member")
+	result['ret_code']=0
+	result['content']=content
+	result['ret_msg']=''
 	return JsonResponse(result)
