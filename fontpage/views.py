@@ -3,6 +3,7 @@ from .models import Article,Usertable,Usergroup,Roletable
 from django.http import JsonResponse
 import time
 from django.contrib.sessions.models import Session
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 def index(request):
 	 content=Article.objects.filter(a_issee=True)
@@ -12,15 +13,15 @@ def index(request):
 def adminIndex(request,message):
 	if request.session.get('u_account',False):
 		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account']);
-		if log_type=='manager':
-			pageList=getSubmitPage(request)
-			personList=PersonList(request,log_type)
-			return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList})
-		elif log_type=='headman':
-			personList=PersonList(request,log_type)
-			return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message,'personList':personList})
+		if log_type.r_type=='manager':
+			# pageList=getSubmitPage(request)
+			# personList=PersonList(request,log_type.r_type)
+			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message})
+		elif log_type.r_type=='headman':
+			personList=PersonList(request,log_type.r_type)
+			return render(request,'fontpage/headman.html',{'account':request.session['u_account'],'message':message,'personList':personList})
 		else:
-			return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message})
+			return render(request,'fontpage/member.html',{'account':request.session['u_account'],'message':message})
 	else:
 		return render(request,'fontpage/login.html')
 
@@ -73,21 +74,27 @@ def addArticle(request):
 	return JsonResponse(result)
 
 def login(request):
-	if request.method=='POST':
-		u_account=request.POST.get('u_account')
-		u_password=request.POST.get('u_password')
-		try:
-			checkUser=Usertable.objects.get(u_account=u_account,u_password=u_password)
-			request.session['u_account']=u_account
-			return render(request,'fontpage/index.html',{'account':u_account})
-		except Exception as e:
-			return render(request,'fontpage/login.html',{'error':'error','account':u_account,'password':u_password})
-	if request.method=='GET':
+	if request.session.get('u_account',False)!=True:
+		if request.method=='POST':
+			u_account=request.POST.get('u_account')
+			u_password=request.POST.get('u_password')
+			try:
+				checkUser=Usertable.objects.get(u_account=u_account,u_password=u_password)
+				request.session['u_account']=u_account
+				result={}
+				result['ret_code']=0
+				result['ret_msg']=''
+				return adminIndex(request,result)
+			except Exception as e:
+				return render(request,'fontpage/login.html',{'error':'error','account':u_account,'password':u_password})
+		if request.method=='GET':
+			return render(request,'fontpage/login.html')
+	else:
 		return render(request,'fontpage/login.html')
 
 def logout(request):
 		result={}
-		if 'u_account' in request.session:
+		if request.session.get('u_account',False):
 			del request.session['u_account']
 			result['ret_code']=0
 			result['ret_msg']="logout"
@@ -119,6 +126,7 @@ def approve(request):
 		result['ret_msg']="illegal"
 		return JsonResponse(result)
 
+@csrf_exempt
 def addUser(request):
 	result={}
 	if request.method=='POST':
@@ -132,7 +140,7 @@ def addUser(request):
 			u_group=Usergroup.objects.get(g_name=new_group)
 			u_role=Roletable.objects.get(r_type=new_role)
 			Usertable(g=u_group,r=u_role,u_account=u_account,u_password=u_password,u_nickname=u_nickname,u_score=u_socre).save()
-			sumperson=Usergroup.objects.get(usertable__u_account=new_account).sumperson
+			sumperson=Usergroup.objects.get(g_name=new_group).sumperson
 			Usergroup.objects.get(usertable__u_account=new_account).sumperson=sumperson+1
 			result['ret_code']=0
 			result['ret_msg']=''
@@ -261,9 +269,11 @@ def getPersonInfo(request):
 def PersonList(request,r_type):
 	if r_type=='manager':
 		content=Usertable.objects.filter(roletable__r_type="headman")
-	elif: r_type=='headman':
+	elif r_type=='headman':
 		content=Usertable.objects.filter(roletable__r_type="member")
 	result['ret_code']=0
 	result['content']=content
 	result['ret_msg']=''
 	return JsonResponse(result)
+
+# def manager(request):return render(request,'fontpage/manager.html')

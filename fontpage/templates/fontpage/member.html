@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load staticfiles %}
+
+    <title>客户中心</title>
+    <base href="{% static 'fontpage/' %}">
+    <meta name="keywords" content="H+后台主题,后台bootstrap框架,会员中心主题,后台HTML,响应式后台">
+    <meta name="description" content="H+是一个完全响应式，基于Bootstrap3最新版本开发的扁平化主题，她采用了主流的左右两栏式布局，使用了Html5+CSS3等现代技术">
+
+    <link rel="shortcut icon" href="favicon.ico"> <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+
+</head>
+<style type="text/css">
+    .label:hover{
+        cursor: pointer;
+    }
+</style>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content  animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-8">
+            <a href="{% url 'index' %}" class="btn btn-sm btn-primary"> 首页</a>
+             <a href="{% url 'logout' %}" class="btn btn-sm btn-primary"> 退出登录</a>
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <h2>文章管理</h2>
+                        <p>
+                           亲！请认真推荐你认为有用的文章哦！
+                        </p>
+                        <div class="input-group">
+                            <div id="modal-form" class="modal fade" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class=" b-r">
+                                                    <h3 class="m-t-none m-b">发布文章</h3>
+                                                    <form role="form" action="{%url 'addArticle'%}" method="post">
+                                                        <div class="form-group">
+                                                            <label>名称：</label>
+                                                            <input type="text" placeholder="请输入文章名称" class="form-control" name="a_title">
+                                                        </div>
+                                                         <div class="form-group">
+                                                            <label>文章类型：</label>
+                                                            <input type="text" placeholder="请输入文章类型" class="form-control" name="a_type">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>URL地址：</label>
+                                                            <input type="password" placeholder="请URL地址" class="form-control" name="a_url">
+                                                        </div>
+                                                        <div>
+                                                            <button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit" id="upUrl"><strong>发布</strong>
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <div class="ibox-content">
+                     
+                                
+                            </div>
+                        </div>
+                        <div class="clients-list">
+                            <ul class="nav nav-tabs">
+                                  <li class=""><a data-toggle="tab" href="#tab-2"><i class="fa fa-briefcase"></i> 人员管理</a>
+                                </li>
+                            </ul>
+                     
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="ibox ">
+
+                    <div class="ibox-content">
+                        <div class="tab-content">
+                            <div id="contact-1" class="tab-pane active">
+                                <div class="row m-b-lg">
+                                    <div class="col-lg-4 text-center">
+                                        <h2>{{u_account}}</h2>
+
+                                        <div class="m-b-sm">
+                                            <img alt="image" class="img-circle" src="img/a2.jpg" style="width: 62px">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <h3>
+                                                扩展
+                                            </h3>
+
+                                       xxxx
+                                        
+                                    </div>
+                                </div>
+                                <div class="client-detail">
+                                    <div class="full-height-scroll">
+
+                                        <strong>扩展</strong>
+
+                                        <ul class="list-group clear-list">
+                                            <li class="list-group-item fist-item">
+                                                <span class="pull-right">XXX</span> XXX
+                                            </li>
+                                           
+                                        </ul>
+                                        <strong>扩展</strong>
+                                        <p>
+                                           xxxx
+                                        </p>
+                                        <hr/>
+                                        <strong>扩展</strong>
+                                        <div id="vertical-timeline" class="vertical-container light-timeline">
+                                            <div class="vertical-timeline-block">
+                                                <div class="vertical-timeline-icon navy-bg">
+                                                    <i class="fa fa-briefcase"></i>
+                                                </div>
+
+                                                <div class="vertical-timeline-content">
+                                                    <h2>xx</h2>
+                                                    <p>xxxx
+                                                    </p>
+                                                    <a href="#" class="btn btn-sm btn-primary"> XXX</a>
+                                                    <span class="vertical-date">
+                                                        xxx <br>
+                                                        <small>xxx</small>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局js -->
+    <script src="js/jquery.min.js?v=2.1.4"></script>
+    <script src="js/bootstrap.min.js?v=3.3.6"></script>
+
+    <script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+    <!-- 自定义js -->
+    <script src="js/content.js?v=1.0.0"></script>
+    <script src="js/plugins/toastr/toastr.min.js"></script>
+    <script>
+        $(function () {
+            $('.full-height-scroll').slimScroll({
+                height: '100%'
+            });
+        });
+
+  
+        $(document).ready(function() {
+            
+        
+           
+
+
+            
+
+
+        });
+    </script>
+
+ 
+</body>
+
+</html>
