@@ -4,6 +4,7 @@ from django.http import JsonResponse
 import time
 from django.contrib.sessions.models import Session
 from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers 
 # Create your views here.
 def index(request):
 	 content=Article.objects.filter(a_issee=True)
@@ -12,13 +13,13 @@ def index(request):
 
 def adminIndex(request,message):
 	if request.session.get('u_account',False):
-		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account']);
+		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account'])
 		if log_type.r_type=='manager':
-			# pageList=getSubmitPage(request)
-			# personList=PersonList(request,log_type.r_type)
-			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message})
+			pageList=getSubmitPage()
+			personList=PersonList(log_type.r_type)
+			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList})
 		elif log_type.r_type=='headman':
-			personList=PersonList(request,log_type.r_type)
+			personList=PersonList(log_type.r_type)
 			return render(request,'fontpage/headman.html',{'account':request.session['u_account'],'message':message,'personList':personList})
 		else:
 			return render(request,'fontpage/member.html',{'account':request.session['u_account'],'message':message})
@@ -88,9 +89,9 @@ def login(request):
 			except Exception as e:
 				return render(request,'fontpage/login.html',{'error':'error','account':u_account,'password':u_password})
 		if request.method=='GET':
-			return render(request,'fontpage/login.html')
+			return render(request,'fontpage/login.html',{'error':"ooo"})
 	else:
-		return render(request,'fontpage/login.html')
+		return render(request,'fontpage/login.html',{'error':"xxx"})
 
 def logout(request):
 		result={}
@@ -139,9 +140,10 @@ def addUser(request):
 		try:
 			u_group=Usergroup.objects.get(g_name=new_group)
 			u_role=Roletable.objects.get(r_type=new_role)
-			Usertable(g=u_group,r=u_role,u_account=u_account,u_password=u_password,u_nickname=u_nickname,u_score=u_socre).save()
-			sumperson=Usergroup.objects.get(g_name=new_group).sumperson
-			Usergroup.objects.get(usertable__u_account=new_account).sumperson=sumperson+1
+			Usertable(g=u_group,r=u_role,u_account=new_account,u_password=new_password,u_nickname=new_nickname,u_score=new_score).save()
+			sumperson=u_group.sumperson
+			u_group.sumperson=sumperson+1
+			u_group.save()
 			result['ret_code']=0
 			result['ret_msg']=''
 		except Exception as e:
@@ -219,7 +221,7 @@ def getGroup(request):
 	result={}
 	group_result=Usergroup.objects.all()
 	result['ret_code']=0
-	result['group_result']=group_result
+	result['group_result']=serializers.serialize("json", group_result)
 	result['ret_msg']=''
 	return JsonResponse(result);
 
@@ -245,10 +247,12 @@ def test(request):
 	return render(request,'fontpage/test.html')
 		
 
-def getSubmitPage(request):
+def getSubmitPage():
+	result={}
 	content=Article.objects.filter(a_issee=False)
 	result['ret_code']=0
-	result['content']=content
+	JsonContent=serializers.serialize("json", content)
+	result['content']=JsonContent
 	result['ret_msg']=''
 	return JsonResponse(result)
 def getPersonInfo(request):
@@ -266,13 +270,14 @@ def getPersonInfo(request):
 	else:
 	 	pass
 	return JsonResponse(result)
-def PersonList(request,r_type):
+def PersonList(r_type):
+	result={}
 	if r_type=='manager':
-		content=Usertable.objects.filter(roletable__r_type="headman")
+		content=Usertable.objects.filter(r__r_type="headman")
 	elif r_type=='headman':
-		content=Usertable.objects.filter(roletable__r_type="member")
+		content=Usertable.objects.filter(r__r_type="member")
 	result['ret_code']=0
-	result['content']=content
+	result['content']=serializers.serialize("json", content)
 	result['ret_msg']=''
 	return JsonResponse(result)
 
