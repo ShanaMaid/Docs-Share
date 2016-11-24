@@ -371,7 +371,7 @@
               var u_account = $("#userid").val();
               var password = $("#userpasswords").val();
               var u_nickname = $("#username").val();
-              var u_grounp = $("#u_grounp").val();
+              var u_group = $("#u_grounp").val();
               var u_role = "headman";
               if (u_account == "" || password =="" || u_nickname == "") {
                 toastr.error("朋友，输入完再说吧");
@@ -386,7 +386,7 @@
                     "u_password":password,
                     "u_nickname":u_nickname,
                     "u_role":u_role,
-                    "u_grounp":u_grounp
+                    "u_group":u_group
                 },
               })
               .done(function(data) {
