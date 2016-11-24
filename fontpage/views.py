@@ -16,6 +16,7 @@ def adminIndex(request,message):
 		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account'])
 		if log_type.r_type=='manager':
 			pageList=getSubmitPage()
+			print 3
 			personList=PersonList(log_type.r_type)
 			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList})
 		elif log_type.r_type=='headman':
@@ -49,16 +50,16 @@ def deleteArticle(request):
 		 result['ret_code']=-2
 		 result['ret_msg']="illegal"
 		 return JsonResponse(result)
-
+@csrf_exempt
 def addArticle(request):
 	result={}
 	if request.method=='POST':
 		a_title=request.POST.get('a_title')
 		a_url=request.POST.get('a_url')
 		a_type=request.POST.get('a_type')
-		a_time=time.asctime(time.localtime(time.time()))
+		a_time=None
 		a_reading_amount=0
-		a_account=request.POST.get('a_account')
+		a_account=request.session['u_account']
 		a_issee=False
 		try:
 			a_User=Usertable.objects.get(u_account=a_account)
@@ -249,11 +250,16 @@ def test(request):
 
 def getSubmitPage():
 	result={}
-	content=Article.objects.filter(a_issee=False)
+	try:
+		content=Article.objects.filter(a_issee=False)
+		print any(content)
+	except Exception as e:
+		print e
 	result['ret_code']=0
 	JsonContent=serializers.serialize("json", content)
 	result['content']=JsonContent
 	result['ret_msg']=''
+	print JsonResponse(result)
 	return JsonResponse(result)
 def getPersonInfo(request):
 	result={}
@@ -273,11 +279,15 @@ def getPersonInfo(request):
 def PersonList(r_type):
 	result={}
 	if r_type=='manager':
-		content=Usertable.objects.filter(r__r_type="headman")
+		try:
+			content=Usertable.objects.filter(r__r_type="headman")
+			print any(content)
+		except Exception as e:
+			print e
 	elif r_type=='headman':
 		content=Usertable.objects.filter(r__r_type="member")
 	result['ret_code']=0
-	result['content']=serializers.serialize("json", content)
+	#result['content']=serializers.serialize("json", content)
 	result['ret_msg']=''
 	return JsonResponse(result)
 
