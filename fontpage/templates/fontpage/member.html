@@ -40,6 +40,12 @@
                             <div id="modal-form" class="modal fade" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
+                                        <div class="modal-header">
+                                             <span class="m-t-none m-b"><strong>输入文章信息</strong></span>
+                                             <button class="close" type="button" data-dismiss="modal">
+                                                <i class="fa fa-remove"></i>
+                                             </button>
+                                        </div>
                                         <div class="modal-body">
                                             <div class="row">
                                                 <div class=" b-r">
@@ -47,15 +53,15 @@
                                                     <form role="form" action="{%url 'addArticle'%}" method="post">
                                                         <div class="form-group">
                                                             <label>名称：</label>
-                                                            <input type="text" placeholder="请输入文章名称" class="form-control" name="a_title">
+                                                            <input type="text" placeholder="请输入文章名称" class="form-control" name="a_title" id="a_title">
                                                         </div>
                                                          <div class="form-group">
                                                             <label>文章类型：</label>
-                                                            <input type="text" placeholder="请输入文章类型" class="form-control" name="a_type">
+                                                            <input type="text" placeholder="请输入文章类型" class="form-control" name="a_type" id="a_type">
                                                         </div>
                                                         <div class="form-group">
                                                             <label>URL地址：</label>
-                                                            <input type="password" placeholder="请URL地址" class="form-control" name="a_url">
+                                                            <input type="password" placeholder="请URL地址" class="form-control" name="a_url" id="a_url">
                                                         </div>
                                                         <div>
                                                             <button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit" id="upUrl"><strong>发布</strong>
@@ -166,7 +172,40 @@
 
   
         $(document).ready(function() {
-            
+             $("#upUrl").on('click', function(event) {     //发表文章
+                event.preventDefault();
+                var a_title = $("#a_title").val();
+                var a_type = $("#a_type").val();
+                var a_url = $("#a_url").val();
+                if (a_title == "" || a_url == "" || a_type == "") {
+                    toastr.error("朋友，输入完再说吧");
+                    return false;
+                }
+                $.ajax({
+                    url: "{%url 'addArticle'%}",
+                    type: 'post',
+                    dataType: 'json',
+                    data: {"a_title": a_title,
+                            "a_type":a_type,
+                            "a_url":a_url
+                },
+                })
+                .done(function(data) {
+                    if (data.ret_code == 0) {
+                        toastr.success("提交成功");
+                        $(".close").trigger('click');
+                    }
+                })
+                .fail(function() {
+                    toastr.error("网络异常，请检查网络情况");
+                })
+                .always(function() {
+                    console.log("complete");
+                });
+                return false;
+            });
+           
+
         
            
 
