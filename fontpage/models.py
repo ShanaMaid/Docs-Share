@@ -25,7 +25,8 @@ class Usertable(models.Model):
     u_password = models.CharField(db_column='U_password', max_length=16, blank=True, null=True)  # Field name made lowercase.
     u_nickname = models.CharField(db_column='U_nickname', max_length=12, blank=True, null=True,default="nick")  # Field name made lowercase.
     u_score = models.IntegerField(db_column='U_score', blank=True, null=True)  # Field name made lowercase.
-
+    def __unicode__(self):
+            return '%s' % (self.u_account)
 
 class Article(models.Model):
     a_id = models.AutoField(db_column='A_Id', primary_key=True)  # Field name made lowercase.
@@ -36,7 +37,8 @@ class Article(models.Model):
     a_time = models.DateField(db_column='A_time', blank=True, null=True)  # Field name made lowercase.
     a_reading_amount = models.BigIntegerField(db_column='A_reading_amount', blank=True, null=True)  # Field name made lowercase.
     a_issee = models.IntegerField(db_column='A_isSee', blank=True, null=True)  # Field name made lowercase.
-
+    def __unicode__(self):
+            return '%s' % (self.u)
 
     def toJSON(self):
         import json

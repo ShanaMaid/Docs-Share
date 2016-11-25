@@ -5,6 +5,7 @@ import time
 from django.contrib.sessions.models import Session
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers 
+import json
 # Create your views here.
 def index(request):
 	 content=Article.objects.filter(a_issee=True)
@@ -16,9 +17,9 @@ def adminIndex(request,message):
 		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account'])
 		if log_type.r_type=='manager':
 			pageList=getSubmitPage()
-			print 3
 			personList=PersonList(log_type.r_type)
-			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList})
+			groupList=getGroup()
+			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList,'groupList':groupList})
 		elif log_type.r_type=='headman':
 			personList=PersonList(log_type.r_type)
 			return render(request,'fontpage/headman.html',{'account':request.session['u_account'],'message':message,'personList':personList})
@@ -86,6 +87,8 @@ def login(request):
 				result={}
 				result['ret_code']=0
 				result['ret_msg']=''
+				#return 2
+				#personForPage(5)
 				return adminIndex(request,result)
 			except Exception as e:
 				return render(request,'fontpage/login.html',{'error':'error','account':u_account,'password':u_password})
@@ -218,13 +221,13 @@ def removeGroup(request):
 		result['ret_msg']="illegal"
 		return JsonResponse(result)
 
-def getGroup(request):
+def getGroup():
 	result={}
 	group_result=Usergroup.objects.all()
 	result['ret_code']=0
 	result['group_result']=serializers.serialize("json", group_result)
 	result['ret_msg']=''
-	return JsonResponse(result);
+	return JsonResponse(result)
 
 def checkRole(request,u_account):
 	result={}
@@ -252,14 +255,21 @@ def getSubmitPage():
 	result={}
 	try:
 		content=Article.objects.filter(a_issee=False)
-		print any(content)
 	except Exception as e:
 		print e
 	result['ret_code']=0
 	JsonContent=serializers.serialize("json", content)
-	result['content']=JsonContent
+	result['content']=json.loads(JsonContent)
 	result['ret_msg']=''
-	print JsonResponse(result)
+	try:
+		for index,values in enumerate(result['content']):
+			values["fields"]["u"]=personForPage(values["fields"]["u"])
+	except Exception as e:
+		print e
+	try:
+		print JsonResponse(result)
+	except Exception as e:
+		print e
 	return JsonResponse(result)
 def getPersonInfo(request):
 	result={}
@@ -281,14 +291,21 @@ def PersonList(r_type):
 	if r_type=='manager':
 		try:
 			content=Usertable.objects.filter(r__r_type="headman")
-			print any(content)
+			#print any(content)
 		except Exception as e:
 			print e
 	elif r_type=='headman':
 		content=Usertable.objects.filter(r__r_type="member")
 	result['ret_code']=0
-	#result['content']=serializers.serialize("json", content)
+	result['content']=json.loads(serializers.serialize("json", content))
 	result['ret_msg']=''
 	return JsonResponse(result)
 
 # def manager(request):return render(request,'fontpage/manager.html')
+def personForPage(uid):
+	try:
+		personInfo=Usertable.objects.get(pk=uid)
+		print personInfo
+	except Exception as e:
+		print e
+	return personInfo.u_account
