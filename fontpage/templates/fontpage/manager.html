@@ -174,15 +174,15 @@
                                                         
                                                         </td>
                                                     </tr>
-                                                    {% for page in pageList %}
+                                                    {% for page in pageList.content %}
                                                   <tr>
-                                                        <td><strong ><a href={{page.a_url}}>{{page.a_title}}</a></strong></td>
+                                                        <td><strong ><a href="http://{{page.fields.a_url}}">{{page.fields.a_title}}</a></strong></td>
                                                         <td>
                                                             <span class="label label-primary agree_a">同意</span>
                                                             <span class="label label-warning disagree_a">拒绝</span>
                                                         </td>
                                                     </tr>
-                                                    {{% endfor %}}
+                                                    {% endfor %}
                                                 
                                                 
                                                   
@@ -203,14 +203,14 @@
                                                         
                                                         </td>
                                                     </tr>
-                                                   {% for person in personList %}
+                                                   {% for person in personList.content %}
                                                     <tr>
-                                                        <td data-id="{{person.u_account}}">{{person.u_nickname}}</td>
+                                                        <td data-id="{{person.fields.u_account}}">{{person.fields.u_nickname}}</td>
                                                         <td>
                                                             <span class="label label-primary deleteMember">删除</span>
                                                         </td>
                                                     </tr>
-                                                    {{% endfor %}}
+                                                    {% endfor %}
                                                     
                                                 </tbody>
                                             </table>
@@ -228,9 +228,9 @@
                                                         
                                                         </td>
                                                     </tr>
-                                                   {% for group in groupList %}
+                                                   {% for group in groupList.content %}
                                                     <tr>
-                                                        <td data-id="{{group.u_account}}">{{group.g_name}}</td>
+                                                        <td data-id="{{group.fields.u_account}}">{{group.fields.g_name}}</td>
                                                         <td>
                                                             <span class="label label-primary deleteGroup">删除</span>
                                                         </td>

@@ -131,14 +131,14 @@
                                                         
                                                         </td>
                                                     </tr>
-                                                    {% for person in personList %}
+                                                    {% for person in personList.content %}
                                                     <tr>
-                                                        <td data-id={{person.u_account}}>{{person.u_nickname}}</td>
+                                                        <td data-id="{{person.fields.u_account}}">{{person.fields.u_nickname}}</td>
                                                         <td>
                                                             <span class="label label-primary deleteMember">删除</span>
                                                         </td>
                                                     </tr>
-                                                    {{% endfor %}}
+                                                    {% endfor %}
                                                     
                                                 </tbody>
                                             </table>
@@ -249,7 +249,7 @@
                     return false;
                 }
                 $.ajax({
-                    url: "{%url 'addArticle'%}",
+                    url: '{%url 'addArticle'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {"a_title": a_title,
@@ -278,7 +278,7 @@
                 
 
                 $.ajax({
-                    url: "{%url 'deleteArticle'%}",
+                    url: '{%url 'deleteArticle'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {
