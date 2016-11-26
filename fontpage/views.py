@@ -19,6 +19,8 @@ def adminIndex(request,message):
 			pageList=getSubmitPage()
 			personList=PersonList(log_type.r_type)
 			groupList=getGroup()
+			print groupList
+			#return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message,'pageList':pageList})
 			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList,'groupList':groupList})
 		elif log_type.r_type=='headman':
 			personList=PersonList(log_type.r_type)
@@ -88,10 +90,10 @@ def login(request):
 				result['ret_code']=0
 				result['ret_msg']=''
 				#return 2
-				#personForPage(5)
+				#return personForPage(5)
 				return adminIndex(request,result)
 			except Exception as e:
-				return render(request,'fontpage/login.html',{'error':'error','account':u_account,'password':u_password})
+				return render(request,'fontpage/login.html',{'error':e,'account':u_account,'password':u_password})
 		if request.method=='GET':
 			return render(request,'fontpage/login.html',{'error':"ooo"})
 	else:
@@ -178,7 +180,7 @@ def removeUser(request):
 		result['ret_code']=-2
 		result['ret_msg']="illegal"
 		return JsonResponse(result)
-
+@csrf_exempt
 def addGroup(request):
 	result={}
 	if request.method=='POST':
@@ -192,11 +194,11 @@ def addGroup(request):
 	 		result['ret_code']=0
 			result['ret_msg']=''
 		finally:
-	 		adminIndex(request,result)
+	 		return JsonResponse(result)
 	else:
 	 	result['ret_code']=-2
 		result['ret_msg']="illegal"
-		adminIndex(request,result)
+		return JsonResponse(result)
 
 def removeGroup(request):
 	result={}
@@ -225,9 +227,9 @@ def getGroup():
 	result={}
 	group_result=Usergroup.objects.all()
 	result['ret_code']=0
-	result['group_result']=serializers.serialize("json", group_result)
+	result['content']=json.loads(serializers.serialize("json", group_result))
 	result['ret_msg']=''
-	return JsonResponse(result)
+	return result
 
 def checkRole(request,u_account):
 	result={}
@@ -266,11 +268,11 @@ def getSubmitPage():
 			values["fields"]["u"]=personForPage(values["fields"]["u"])
 	except Exception as e:
 		print e
-	try:
-		print JsonResponse(result)
-	except Exception as e:
-		print e
-	return JsonResponse(result)
+	# try:
+	# 	print JsonResponse(result)
+	# except Exception as e:
+	# 	print e
+	return result
 def getPersonInfo(request):
 	result={}
 	if request.method=='POST':
@@ -299,13 +301,13 @@ def PersonList(r_type):
 	result['ret_code']=0
 	result['content']=json.loads(serializers.serialize("json", content))
 	result['ret_msg']=''
-	return JsonResponse(result)
+	return result
 
 # def manager(request):return render(request,'fontpage/manager.html')
 def personForPage(uid):
 	try:
 		personInfo=Usertable.objects.get(pk=uid)
-		print personInfo
+		#print personInfo
 	except Exception as e:
 		print e
 	return personInfo.u_account
