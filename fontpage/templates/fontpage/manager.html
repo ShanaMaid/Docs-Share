@@ -438,7 +438,7 @@
                 
 
                 $.ajax({
-                    url: "{%url 'removeUser'%}",
+                    url: "{%url 'deleteArticle'%}",
                     type: 'post',
                     dataType: 'json',
                     data: {
@@ -468,7 +468,7 @@
                 
 
                 $.ajax({
-                    url: "{%url 'deleteArticle'%}",
+                    url: "{%url 'removeUser'%}",
                     type: 'post',
                     dataType: 'json',
                     data: {
@@ -542,7 +542,7 @@
             $(".deleteGroup").on('click', function(event) {
                 event.preventDefault();
                 var g_name = $(this).prev().text();
-                
+                console.log(g_name)
                  $.ajax({
                      url: "{%url 'removeGroup'%}",
                      type: 'post',

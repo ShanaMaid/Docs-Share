@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Article,Usertable,Usergroup,Roletable
 from django.http import JsonResponse
-import time
+import datetime
 from django.contrib.sessions.models import Session
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers 
@@ -9,18 +9,17 @@ import json
 # Create your views here.
 def index(request):
 	 content=Article.objects.filter(a_issee=True)
+	 content= json.loads(serializers.serialize("json", content))
 	 return render(request,'fontpage/index.html',{'content':content})
-	#return render(request,'fontpage/index2.html')
 
-def adminIndex(request,message):
+def adminIndex(request):
+	message={}
 	if request.session.get('u_account',False):
 		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account'])
 		if log_type.r_type=='manager':
 			pageList=getSubmitPage()
 			personList=PersonList(log_type.r_type)
 			groupList=getGroup()
-			print groupList
-			#return render(request,'fontpage/index.html',{'account':request.session['u_account'],'message':message,'pageList':pageList})
 			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList,'groupList':groupList})
 		elif log_type.r_type=='headman':
 			personList=PersonList(log_type.r_type)
@@ -29,7 +28,7 @@ def adminIndex(request,message):
 			return render(request,'fontpage/member.html',{'account':request.session['u_account'],'message':message})
 	else:
 		return render(request,'fontpage/login.html')
-
+@csrf_exempt
 def deleteArticle(request):
 	result={}
 	if request.is_ajax():
@@ -60,7 +59,7 @@ def addArticle(request):
 		a_title=request.POST.get('a_title')
 		a_url=request.POST.get('a_url')
 		a_type=request.POST.get('a_type')
-		a_time=None
+		a_time=datetime.datetime.now().strftime("%Y-%m-%d")
 		a_reading_amount=0
 		a_account=request.session['u_account']
 		a_issee=False
@@ -79,7 +78,6 @@ def addArticle(request):
 	return JsonResponse(result)
 
 def login(request):
-	if request.session.get('u_account',False)!=True:
 		if request.method=='POST':
 			u_account=request.POST.get('u_account')
 			u_password=request.POST.get('u_password')
@@ -89,15 +87,11 @@ def login(request):
 				result={}
 				result['ret_code']=0
 				result['ret_msg']=''
-				#return 2
-				#return personForPage(5)
-				return adminIndex(request,result)
+				return adminIndex(request)
 			except Exception as e:
 				return render(request,'fontpage/login.html',{'error':e,'account':u_account,'password':u_password})
 		if request.method=='GET':
 			return render(request,'fontpage/login.html',{'error':"ooo"})
-	else:
-		return render(request,'fontpage/login.html',{'error':"xxx"})
 
 def logout(request):
 		result={}
@@ -109,17 +103,18 @@ def logout(request):
 		else:
 			return render(request,'fontpage/login.html')
 
+@csrf_exempt
 def approve(request):
 	result={}
 	if request.is_ajax():
 		a_title=request.POST.get('a_title')
 		try:
-			approve_article=Article.object.get(a_title=a_title)
+			approve_article=Article.objects.get(a_title=a_title)
 			approve_article.a_issee=True
-			approve.save()
+			approve_article.save()
 			provider=Usertable.objects.filter(article__a_title=a_title)
 			for single in provider:
-				single.u_socre=single.u_socre+10
+				single.u_score=single.u_score+10
 				single.save()
 			result['ret_code']=0
 			result['ret_msg']=''
@@ -159,13 +154,13 @@ def addUser(request):
 		result['ret_code']=-2
 		result['ret_msg']="illegal"
 	return JsonResponse(result)
-
+@csrf_exempt
 def removeUser(request):
 	result={}
 	if request.is_ajax():
 		u_account=request.POST.get('u_account')
 		try:
-			re_user=Usergroup.objects.get(u_account=u_account)
+			re_user=Usertable.objects.get(u_account=u_account)
 			sumperson=Usergroup.objects.get(usertable__u_account=u_account).sumperson
 			Usergroup.objects.get(usertable__u_account=u_account).sumperson=sumperson-1
 			re_user.delete()
@@ -199,13 +194,13 @@ def addGroup(request):
 	 	result['ret_code']=-2
 		result['ret_msg']="illegal"
 		return JsonResponse(result)
-
+@csrf_exempt
 def removeGroup(request):
 	result={}
-	if request.is_ajax():
+	if request.method=='POST':
 		group_title=request.POST.get('g_name')
 		try:
-			re_group=Usergroup.objects.get(g_name=g_name)
+			re_group=Usergroup.objects.get(g_name=group_title)
 			if re_group.sumperson!=0:
 				result['ret_code']=-4
 				result['ret_msg']='can not delete'
@@ -268,10 +263,6 @@ def getSubmitPage():
 			values["fields"]["u"]=personForPage(values["fields"]["u"])
 	except Exception as e:
 		print e
-	# try:
-	# 	print JsonResponse(result)
-	# except Exception as e:
-	# 	print e
 	return result
 def getPersonInfo(request):
 	result={}
@@ -303,7 +294,6 @@ def PersonList(r_type):
 	result['ret_msg']=''
 	return result
 
-# def manager(request):return render(request,'fontpage/manager.html')
 def personForPage(uid):
 	try:
 		personInfo=Usertable.objects.get(pk=uid)
