@@ -345,7 +345,7 @@
                     return false;
                 }
                 $.ajax({
-                    url: "{%url 'addArticle'%}",
+                    url: '{%url 'addArticle'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {"a_title": a_title,
@@ -380,7 +380,7 @@
                     toastr.error("朋友，你确定你有输入吗？");
                 }
                 $.ajax({
-                    url: "{%url 'addGroup'%}",
+                    url: '{%url 'addGroup'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {"g_name": g_name},
@@ -408,7 +408,7 @@
                 
 
                 $.ajax({
-                    url: "{%url 'approve'%}",
+                    url: '{%url 'approve'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {
@@ -438,7 +438,7 @@
                 
 
                 $.ajax({
-                    url: "{%url 'deleteArticle'%}",
+                    url: '{%url 'deleteArticle'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {
@@ -468,7 +468,7 @@
                 
 
                 $.ajax({
-                    url: "{%url 'removeUser'%}",
+                    url: '{%url 'removeUser'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {
@@ -544,7 +544,7 @@
                 var g_name = $(this).prev().text();
                 console.log(g_name)
                  $.ajax({
-                     url: "{%url 'removeGroup'%}",
+                     url: '{%url 'removeGroup'%}',
                      type: 'post',
                      dataType: 'json',
                      data: {"g_name": g_name},
