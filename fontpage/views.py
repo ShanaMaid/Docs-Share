@@ -20,6 +20,7 @@ def adminIndex(request):
 			pageList=getSubmitPage()
 			personList=PersonList(log_type.r_type)
 			groupList=getGroup()
+			print pageList
 			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList,'groupList':groupList})
 		elif log_type.r_type=='headman':
 			personList=PersonList(log_type.r_type)
@@ -32,13 +33,13 @@ def adminIndex(request):
 def deleteArticle(request):
 	result={}
 	if request.is_ajax():
-		a_id=request.POST.get('article_id')
+		a_title=request.POST.get('a_title')
 		u_account=request.POST.get('u_account')
 		try:
-			det_article=Article.objects.get(a_id=a_id)
+			det_article=Article.objects.get(a_title=a_title)
 			mod_user=Usertable.objects.get(u_account=u_account)
-			det_score=mod_user.u_socre
-			mod_user.u_socre=det_score-10
+			det_score=mod_user.u_score
+			mod_user.u_score=det_score-10
 			det_article.delete()
 			mod_user.save()
 			result['ret_code']=0
@@ -99,7 +100,7 @@ def logout(request):
 			del request.session['u_account']
 			result['ret_code']=0
 			result['ret_msg']="logout"
-			return render(request,'fontpage/index.html')
+			return index(request)
 		else:
 			return render(request,'fontpage/login.html')
 

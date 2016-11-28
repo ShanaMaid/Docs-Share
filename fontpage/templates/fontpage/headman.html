@@ -273,12 +273,13 @@
             });
            
 
-                $(".deleteMember").on('click', function(event) {    //删除这名成员
+                $(".deleteMember").on('click',deleteUser) 
+                function deleteUser(event) {    //删除这名成员
                 var u_account = $(this).parent().prev().attr('data-id');
-                
+                var this_user = $(this);
 
                 $.ajax({
-                    url: '{%url 'deleteArticle'%}',
+                    url: '{%url 'removeUser'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {
@@ -288,7 +289,7 @@
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success('删除成功');
-                        $(this).parent().parent().remove();
+                        this_user.parent().parent().remove();
                     }else {
                        toastr.error(data.ret_msg); 
                     }
@@ -301,7 +302,7 @@
                 });
                 
                 
-            }); 
+            }; 
 
             $("#upnewMember").on('click', function(event) {    //添加新的成员
               var u_account = $("#userid").val();
@@ -319,8 +320,8 @@
                     "u_account": u_account,
                     "password":password,
                     "u_nickname":u_nickname,
-                    "u_role":member,
-                },
+                    "u_role":member
+                }
               })
               .done(function(data) {
                   if(data.ret_code == 0){
@@ -331,12 +332,14 @@
                                                         '<span class="label label-primary deleteMember">删除</span>'+
                                                         '</td>'+
                                                     '</tr>');
+                    $(".deleteMember").on('click', deleteUser);
+                    &(".close").trigger('click');
                   }else{
                      toastr.error(data.ret_msg); 
                   }
               })
               .fail(function() {
-                  console.log("error");
+                  toastr.error("添加失败，请检查你的网络连接情况"); 
               })
               .always(function() {
                   console.log("complete");

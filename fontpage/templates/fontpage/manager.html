@@ -61,7 +61,7 @@
                                                         </div>
                                                         <div class="form-group">
                                                             <label>URL地址：</label>
-                                                            <input type="password" placeholder="请URL地址" class="form-control" name="a_url" id="a_url">
+                                                            <input type="text" placeholder="请URL地址" class="form-control" name="a_url" id="a_url">
                                                         </div>
                                                         <div>
                                                             <button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit" id="upUrl"><strong>发布</strong>
@@ -176,7 +176,7 @@
                                                     </tr>
                                                     {% for page in pageList.content %}
                                                   <tr>
-                                                        <td><strong ><a href="http://{{page.fields.a_url}}">{{page.fields.a_title}}</a></strong></td>
+                                                        <td><strong ><a href="http://{{page.fields.a_url}}" data-id="{{page.fields.u}}">{{page.fields.a_title}}</a></strong></td>
                                                         <td>
                                                             <span class="label label-primary agree_a">同意</span>
                                                             <span class="label label-warning disagree_a">拒绝</span>
@@ -204,7 +204,7 @@
                                                         </td>
                                                     </tr>
                                                    {% for person in personList.content %}
-                                                    <tr>
+                                                    <tr class="personList">
                                                         <td data-id="{{person.fields.u_account}}">{{person.fields.u_nickname}}</td>
                                                         <td>
                                                             <span class="label label-primary deleteMember">删除</span>
@@ -221,7 +221,7 @@
                                     <div class="full-height-scroll">
                                         <div class="table-responsive">
                                             <table class="table table-striped table-hover">
-                                                <tbody id="menberView">
+                                                <tbody id="groupView">
                                                     <tr>
                                                         <th> 小组名</th>
                                                         <td>
@@ -230,7 +230,7 @@
                                                     </tr>
                                                    {% for group in groupList.content %}
                                                     <tr>
-                                                        <td data-id="{{group.fields.u_account}}">{{group.fields.g_name}}</td>
+                                                        <td>{{group.fields.g_name}}</td>
                                                         <td>
                                                             <span class="label label-primary deleteGroup">删除</span>
                                                         </td>
@@ -351,16 +351,18 @@
                     data: {"a_title": a_title,
                             "a_type":a_type,
                             "a_url":a_url
-                },
+                }
                 })
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success("提交成功");
                         var pageNotes = "<tr><td><strong ><a href="+a_url +">"+ a_title+"</a></strong></td>"+
                                         "<td><span class='label label-primary agree_a'>同意</span>"+
-                                        "<span class='label label-warning disagree_a'>拒绝</span>"+
+                                        " <span class='label label-warning disagree_a'>拒绝</span>"+
                                                         "</td></tr>";
                         $(".pageView").append(pageNotes);
+                        $(".agree_a").on('click', agreeArticle);
+                        $(".disagree_a").on('click',disagreeArticle);
                         $(".close").trigger('click');
                     }
                 })
@@ -373,7 +375,7 @@
                 
             });
 
-            $("#upnewGroup").on('click', function(event) {
+            $("#upnewGroup").on('click', function(event) {    //添加新的用户组
                 event.preventDefault();
                 var g_name = $("#g_name").val();
                 if (g_name == "") {
@@ -388,6 +390,10 @@
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success("添加用户组成功");
+                        var newGroup = " <tr><td>"+g_name+"</td><td><span class='label label-primary deleteGroup'>删除</span></td></tr>"
+                        $("#groupView").append(newGroup);
+                        $(".deleteGroup").on('click',deleteGroup);
+                        $(".close").trigger('click');
                     }else{
                         toastr.error(data.ret_msg);
                     }
@@ -403,9 +409,10 @@
 
 
 
-            $(".agree_a").on('click', function(event) {    //同意发表这篇文章
+            $(".agree_a").on('click', agreeArticle)
+            function agreeArticle(event) {    //同意发表这篇文章
                 var a_title = $(this).parent().prev().children().text();
-                
+                var this_article = $(this);
 
                 $.ajax({
                     url: '{%url 'approve'%}',
@@ -418,7 +425,7 @@
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success('发表成功');
-                        $(this).parent().parent().remove();
+                        this_article.parent().parent().remove();
                     }else {
                        toastr.success(data.ret_msg); 
                     }
@@ -431,24 +438,28 @@
                 });
                 
                 
-            }); 
+            }; 
 
-            $(".disagree_a").on('click', function(event) {    //拒绝发表这篇文章
+            $(".disagree_a").on('click', disagreeArticle)
+            function disagreeArticle(event) {    //拒绝发表这篇文章
                 var a_title = $(this).parent().prev().children().text();
-                
+                var u_account = $(this).parent().prev().children().children().attr("data-id");
+                alert(u_account);
+                var this_article = $(this);
 
                 $.ajax({
                     url: '{%url 'deleteArticle'%}',
                     type: 'post',
                     dataType: 'json',
                     data: {
-                        "a_title": a_title
+                        "a_title": a_title,
+                        "u_account":u_account
                       }  
                 })
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success('拒绝发表成功');
-                        $(this).parent().parent().remove();
+                        this_article.parent().parent().remove();
                     }else {
                        toastr.success(data.ret_msg); 
                     }
@@ -461,12 +472,13 @@
                 });
                 
                 
-            }); 
+            }; 
 
-                $(".deleteMember").on('click', function(event) {    //删除这名用户
+                $(".deleteMember").on('click', deleteMember);
+
+                function deleteMember(event) {    //删除这名用户
                 var u_account = $(this).parent().prev().attr('data-id');
-                
-
+                var this_person = $(this);
                 $.ajax({
                     url: '{%url 'removeUser'%}',
                     type: 'post',
@@ -478,7 +490,8 @@
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success('删除成功');
-                        $(this).parent().parent().remove();
+                        this_person.parent().parent().remove();
+                       
                     }else {
                        toastr.error(data.ret_msg); 
                     }
@@ -491,7 +504,7 @@
                 });
                 
                 
-            }); 
+            }; 
 
             $("#upnewMember").on('click', function(event) {    //添加新的成员
               var u_account = $("#userid").val();
@@ -524,6 +537,7 @@
                                                         '<span class="label label-primary deleteMember">删除</span>'+
                                                         '</td>'+
                                                     '</tr>');
+                    $(".deleteMember").on('click', deleteMember);
                     $(".close").trigger("click");
                   }else{
                      toastr.error(data.ret_msg); 
@@ -539,9 +553,12 @@
               
             });
 
-            $(".deleteGroup").on('click', function(event) {
+            $(".deleteGroup").on('click', deleteGroup);
+            function deleteGroup(event) {
                 event.preventDefault();
-                var g_name = $(this).prev().text();
+                var g_name = $(this).parent().prev().text();
+                alert(g_name);
+                var this_group = $(this);
                 console.log(g_name)
                  $.ajax({
                      url: '{%url 'removeGroup'%}',
@@ -552,6 +569,8 @@
                  .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success("删除小组成功");
+                        this_group.parent().parent().remove();
+
                     }else{
                         toastr.error(data.ret_msg);
                     }
@@ -564,7 +583,7 @@
                      console.log("complete");
                  });
 
-            });
+            };
 
 
         });
