@@ -1,3 +1,4 @@
+#coding:utf-8
 from django.shortcuts import render
 from .models import Article,Usertable,Usergroup,Roletable
 from django.http import JsonResponse
@@ -20,7 +21,7 @@ def adminIndex(request):
 			pageList=getSubmitPage()
 			personList=PersonList(log_type.r_type)
 			groupList=getGroup()
-			print pageList
+			#print pageList
 			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList,'groupList':groupList})
 		elif log_type.r_type=='headman':
 			personList=PersonList(log_type.r_type)
@@ -138,8 +139,19 @@ def addUser(request):
 		new_nickname=request.POST.get('u_nickname')
 		new_score=0
 		new_role=request.POST.get('u_role')
-		new_group=request.POST.get('u_group')
+		rec_account=request.session['u_account']
+		rec_role=Roletable.objects.get(usertable__u_account=rec_account)
+		if rec_role.r_type=="headman":
+			new_group=Usergroup.objects.get(usertable__u_account=rec_account).g_name
+		else:
+			new_group=request.POST.get('u_group')
+		print new_account
 		try:
+			no_re=Usertable.objects.get(u_account=new_account)
+			result['ret_code']=-1
+			result['ret_msg']="user already exist"
+			print 222
+		except Exception as e:
 			u_group=Usergroup.objects.get(g_name=new_group)
 			u_role=Roletable.objects.get(r_type=new_role)
 			Usertable(g=u_group,r=u_role,u_account=new_account,u_password=new_password,u_nickname=new_nickname,u_score=new_score).save()
@@ -148,13 +160,12 @@ def addUser(request):
 			u_group.save()
 			result['ret_code']=0
 			result['ret_msg']=''
-		except Exception as e:
-			result['ret_code']=-1
-			result['ret_msg']=e
+		finally:
+			return JsonResponse(result)
 	else:
 		result['ret_code']=-2
 		result['ret_msg']="illegal"
-	return JsonResponse(result)
+		return JsonResponse(result)
 @csrf_exempt
 def removeUser(request):
 	result={}
@@ -298,7 +309,6 @@ def PersonList(r_type):
 def personForPage(uid):
 	try:
 		personInfo=Usertable.objects.get(pk=uid)
-		#print personInfo
 	except Exception as e:
 		print e
 	return personInfo.u_account
