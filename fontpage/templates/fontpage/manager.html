@@ -24,7 +24,7 @@
         cursor: pointer;
     }
 </style>
-<body class="gray-bg">
+<body class="gray-bg" data-id="{{account}}">
     <div class="wrapper wrapper-content  animated fadeInRight">
         <div class="row">
             <div class="col-sm-8">
@@ -176,7 +176,7 @@
                                                     </tr>
                                                     {% for page in pageList.content %}
                                                   <tr>
-                                                        <td><strong ><a href="http://{{page.fields.a_url}}" data-id="{{page.fields.u}}">{{page.fields.a_title}}</a></strong></td>
+                                                        <td><strong ><a href="{{page.fields.a_url}}" data-id="{{page.fields.u}}">{{page.fields.a_title}}</a></strong></td>
                                                         <td>
                                                             <span class="label label-primary agree_a">同意</span>
                                                             <span class="label label-warning disagree_a">拒绝</span>
@@ -334,12 +334,17 @@
         });
 
         $(document).ready(function() {
-
+            var userId = $("body").attr('data-id');
             $("#upUrl").on('click', function(event) {     //发表文章
                 event.preventDefault();
                 var a_title = $("#a_title").val();
                 var a_type = $("#a_type").val();
                 var a_url = $("#a_url").val();
+                if (a_url.substr(0,4) != "http") {
+                    a_url = "http://" + a_url;
+                }
+           
+                
                 if (a_title == "" || a_url == "" || a_type == "") {
                     toastr.error("朋友，输入完再说吧");
                     return false;
@@ -356,7 +361,7 @@
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success("提交成功");
-                        var pageNotes = "<tr><td><strong ><a href='http://"+a_url +"'>"+ a_title+"</a></strong></td>"+
+                        var pageNotes = "<tr><td><strong ><a href='"+a_url +"' data-id = '" + userId + "'>"+ a_title+"</a></strong></td>"+
                                         "<td><span class='label label-primary agree_a'>同意</span>"+
                                         " <span class='label label-warning disagree_a'>拒绝</span>"+
                                                         "</td></tr>";
@@ -444,7 +449,7 @@
             function disagreeArticle(event) {    //拒绝发表这篇文章
                 var a_title = $(this).parent().prev().children().text();
                 var u_account = $(this).parent().prev().children().children().attr("data-id");
-                alert(u_account);
+                
                 var this_article = $(this);
 
                 $.ajax({
@@ -557,9 +562,7 @@
             function deleteGroup(event) {
                 event.preventDefault();
                 var g_name = $(this).parent().prev().text();
-                alert(g_name);
                 var this_group = $(this);
-                console.log(g_name)
                  $.ajax({
                      url: '{%url 'removeGroup'%}',
                      type: 'post',

@@ -181,6 +181,9 @@
                     toastr.error("朋友，输入完再说吧");
                     return false;
                 }
+                if (a_url.substr(0,4) != "http") {
+                    a_url = "http://" + a_url;
+                }
                 $.ajax({
                     url: '{%url 'addArticle'%}',
                     type: 'post',
