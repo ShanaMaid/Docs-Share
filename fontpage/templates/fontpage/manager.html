@@ -170,16 +170,16 @@
                                                 <tbody class="pageView">
                                                     <tr>
                                                         <th> 文章名称</th>
-                                                        <td>
-                                                        
-                                                        </td>
-                                                    </tr>
+                                                        <th>作者</th>
+                                                        <th>发布时间</th>
+                                                        <th></th>
                                                     {% for page in pageList.content %}
                                                   <tr>
                                                         <td><strong ><a href="{{page.fields.a_url}}" data-id="{{page.fields.u}}">{{page.fields.a_title}}</a></strong></td>
+                                                        <td><strong>{{page.u}}</strong></td>
+                                                        <td><strong>{{page.fields.a_time}}</strong></td>
                                                         <td>
-                                                            <span class="label label-primary agree_a">同意</span>
-                                                            <span class="label label-warning disagree_a">拒绝</span>
+                                                            <span class="label label-warning delete_a">删除</span>
                                                         </td>
                                                     </tr>
                                                     {% endfor %}
@@ -363,11 +363,11 @@
                         toastr.success("提交成功");
                         var pageNotes = "<tr><td><strong ><a href='"+a_url +"' data-id = '" + userId + "'>"+ a_title+"</a></strong></td>"+
                                         "<td><span class='label label-primary agree_a'>同意</span>"+
-                                        " <span class='label label-warning disagree_a'>拒绝</span>"+
+                                        " <span class='label label-warning delete_a'>拒绝</span>"+
                                                         "</td></tr>";
                         $(".pageView").append(pageNotes);
                         $(".agree_a").on('click', agreeArticle);
-                        $(".disagree_a").on('click',disagreeArticle);
+                        $(".delete_a").on('click',disagreeArticle);
                         $(".close").trigger('click');
                     }
                 })
@@ -414,39 +414,9 @@
 
 
 
-            $(".agree_a").on('click', agreeArticle)
-            function agreeArticle(event) {    //同意发表这篇文章
-                var a_title = $(this).parent().prev().children().text();
-                var this_article = $(this);
-
-                $.ajax({
-                    url: '{%url 'approve'%}',
-                    type: 'post',
-                    dataType: 'json',
-                    data: {
-                        "a_title": a_title
-                      }  
-                })
-                .done(function(data) {
-                    if (data.ret_code == 0) {
-                        toastr.success('发表成功');
-                        this_article.parent().parent().remove();
-                    }else {
-                       toastr.success(data.ret_msg); 
-                    }
-                })
-                .fail(function() {
-                    toastr.error('发布失败，请检查你的网络情况');
-                })
-                .always(function() {
-                    console.log("complete");
-                });
-                
-                
-            }; 
-
-            $(".disagree_a").on('click', disagreeArticle)
-            function disagreeArticle(event) {    //拒绝发表这篇文章
+            
+            $(".delete_a").on('click', disagreeArticle);
+            function disagreeArticle(event) {    //删除已经发表的文章
                 var a_title = $(this).parent().prev().children().text();
                 var u_account = $(this).parent().prev().children().children().attr("data-id");
                 
@@ -463,7 +433,7 @@
                 })
                 .done(function(data) {
                     if (data.ret_code == 0) {
-                        toastr.success('拒绝发表成功');
+                        toastr.success('删除文章成功');
                         this_article.parent().parent().remove();
                     }else {
                        toastr.success(data.ret_msg); 
