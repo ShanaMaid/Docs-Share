@@ -31,6 +31,7 @@ class Usertable(models.Model):
 class Article(models.Model):
     a_id = models.AutoField(db_column='A_Id', primary_key=True)  # Field name made lowercase.
     u = models.ForeignKey(Usertable, db_column='U_Id', blank=True, null=True)  # Field name made lowercase.
+    g = models.ForeignKey(Usergroup, db_column='G_Id', blank=True, null=True)  # Field name made lowercase.
     a_title = models.CharField(db_column='A_title', max_length=20, blank=True, null=True)  # Field name made lowercase.
     a_url = models.TextField(db_column='A_URL', blank=True, null=True)  # Field name made lowercase.
     a_type = models.CharField(db_column='A_type', max_length=20, blank=True, null=True)  # Field name made lowercase.

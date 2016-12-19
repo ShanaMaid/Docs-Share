@@ -17,17 +17,17 @@ def adminIndex(request):
 	message={}
 	if request.session.get('u_account',False):
 		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account'])
+		pageList=getSubmitPage()
 		if log_type.r_type=='manager':
-			pageList=getSubmitPage()
 			personList=PersonList(log_type.r_type)
 			groupList=getGroup()
 			#print pageList
 			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList,'groupList':groupList})
 		elif log_type.r_type=='headman':
 			personList=PersonList(log_type.r_type)
-			return render(request,'fontpage/headman.html',{'account':request.session['u_account'],'message':message,'personList':personList})
+			return render(request,'fontpage/headman.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList})
 		else:
-			return render(request,'fontpage/member.html',{'account':request.session['u_account'],'message':message})
+			return render(request,'fontpage/member.html',{'account':request.session['u_account'],'pageList':pageList,'message':message})
 	else:
 		return render(request,'fontpage/login.html')
 @csrf_exempt
@@ -64,10 +64,11 @@ def addArticle(request):
 		a_time=datetime.datetime.now().strftime("%Y-%m-%d")
 		a_reading_amount=0
 		a_account=request.session['u_account']
-		a_issee=False
+		a_issee=True
 		try:
 			a_User=Usertable.objects.get(u_account=a_account)
-			new_article=Article(u=a_User,a_title=a_title,a_url=a_url,a_type=a_type,a_time=a_time,a_reading_amount=a_reading_amount,a_issee=a_issee)
+			a_group=Usergroup.objects.get(usertable__u_account=a_account)
+			new_article=Article(u=a_User,g=a_group,a_title=a_title,a_url=a_url,a_type=a_type,a_time=a_time,a_reading_amount=a_reading_amount,a_issee=a_issee)
 			new_article.save()
 			result['ret_code']=0
 			result['ret_msg']=''
@@ -133,6 +134,7 @@ def approve(request):
 @csrf_exempt
 def addUser(request):
 	result={}
+	print 2
 	if request.method=='POST':
 		new_account=request.POST.get('u_account')
 		new_password=request.POST.get('u_password')
@@ -140,6 +142,7 @@ def addUser(request):
 		new_score=0
 		new_role=request.POST.get('u_role')
 		rec_account=request.session['u_account']
+		print rec_account
 		rec_role=Roletable.objects.get(usertable__u_account=rec_account)
 		if rec_role.r_type=="headman":
 			new_group=Usergroup.objects.get(usertable__u_account=rec_account).g_name
@@ -263,7 +266,9 @@ def test(request):
 def getSubmitPage():
 	result={}
 	try:
-		content=Article.objects.filter(a_issee=False)
+		a_account=request.session['u_account']
+		a_group=Usergroup.objects.get(usertable__u_account=a_account)
+		content=Article.objects.filter(g=a_group)
 	except Exception as e:
 		print e
 	result['ret_code']=0
