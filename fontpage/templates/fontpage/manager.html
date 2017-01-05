@@ -417,7 +417,7 @@
             
             $(".delete_a").on('click', disagreeArticle);
             function disagreeArticle(event) {    //删除已经发表的文章
-                var a_title = $(this).parent().prev().prev()..prev().children().text();
+                var a_title = $(this).parent().prev().prev().prev().children().text();
                 var u_account = $(this).parent().prev().prev().prev().children().children().attr("data-id");
                 
                 var this_article = $(this);
