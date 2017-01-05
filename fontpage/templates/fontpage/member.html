@@ -235,6 +235,7 @@
                     if (data.ret_code == 0) {
                         toastr.success("发表成功");
                         $(".close").trigger('click');
+                        window.location.reload()
                     }
                 })
                 .fail(function() {

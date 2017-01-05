@@ -362,11 +362,9 @@
                     if (data.ret_code == 0) {
                         toastr.success("提交成功");
                         var pageNotes = "<tr><td><strong ><a href='"+a_url +"' data-id = '" + userId + "'>"+ a_title+"</a></strong></td>"+
-                                        "<td><span class='label label-primary agree_a'>同意</span>"+
-                                        " <span class='label label-warning delete_a'>拒绝</span>"+
+                                        +" <span class='label label-warning delete_a'>删除</span>"+
                                                         "</td></tr>";
                         $(".pageView").append(pageNotes);
-                        $(".agree_a").on('click', agreeArticle);
                         $(".delete_a").on('click',disagreeArticle);
                         $(".close").trigger('click');
                     }
