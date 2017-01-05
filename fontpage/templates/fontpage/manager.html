@@ -368,9 +368,10 @@
                         var str = "" + date.getFullYear() + "-";
                         str += (date.getMonth()+1) + "-";
                         str += date.getDate(); 
+                        alert(str);
                         var pageNotes = " <tr><td><strong ><a href='"+ a_url+"' data-id='"+userId+"'>"+a_title+"</a></strong></td>"+
                                                         "<td><strong>"+nickname+"</strong></td>"+
-                                                        "<td><strong>"+date+"</strong></td>"+
+                                                        "<td><strong>"+str+"</strong></td>"+
                                                         "<td><span class='label label-warning delete_a'>删除</span></td></tr>";
                         $(".pageView").append(pageNotes);
                         $(".delete_a").on('click',disagreeArticle);
