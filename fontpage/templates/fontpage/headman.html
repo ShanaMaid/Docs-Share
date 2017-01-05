@@ -24,7 +24,7 @@
         cursor: pointer;
     }
 </style>
-<body class="gray-bg">
+<body class="gray-bg" data-id="{{nickname}}">
     <div class="wrapper wrapper-content  animated fadeInRight">
         <div class="row">
             <div class="col-sm-8">
@@ -273,7 +273,7 @@
 
   
         $(document).ready(function() {
-            
+            var nickname = $("body").attr('data-id');
             $("#upUrl").on('click', function(event) {     //发表文章
                 event.preventDefault();
                 var a_title = $("#a_title").val();
@@ -298,11 +298,20 @@
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success("提交成功");
+                  
+                        var date = new Date();
+                        var str = "" + date.getFullYear() + "-";
+                        str += (date.getMonth()+1) + "-";
+                        str += date.getDate(); 
+                        var article = " <tr>"+
+                                              "<td><strong ><a href='"+ a_url+"'>"+a_title+"</a></strong></td>"+
+                                                        "<td><strong>"+nickname"+</strong></td>"+
+                                                        "<td><strong>"+date+"</strong></td></tr>"
+                        $(".pageView").append(article);
                         $("#a_title").val("");
                         $("#a_type").val("");
                         $("#a_url").val("");
                         $(".close").trigger('click');
-                        window.location.reload()；
                     }
                 })
                 .fail(function() {

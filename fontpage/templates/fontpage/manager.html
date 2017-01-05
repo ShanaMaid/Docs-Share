@@ -24,7 +24,7 @@
         cursor: pointer;
     }
 </style>
-<body class="gray-bg" data-id="{{account}}">
+<body class="gray-bg" data-id="{{account}}" data-name="{{nickname}}">
     <div class="wrapper wrapper-content  animated fadeInRight">
         <div class="row">
             <div class="col-sm-8">
@@ -335,6 +335,7 @@
 
         $(document).ready(function() {
             var userId = $("body").attr('data-id');
+            var nickname = $("body").attr('data-name');
             $("#upUrl").on('click', function(event) {     //发表文章
                 event.preventDefault();
                 var a_title = $("#a_title").val();
@@ -361,9 +362,11 @@
                 .done(function(data) {
                     if (data.ret_code == 0) {
                         toastr.success("提交成功");
-                        var pageNotes = "<tr><td><strong ><a href='"+a_url +"' data-id = '" + userId + "'>"+ a_title+"</a></strong></td>"+
-                                        +" <span class='label label-warning delete_a'>删除</span>"+
-                                                        "</td></tr>";
+                        var pageNotes = " <tr>"+
+                                              "<td><strong ><a href='"+ a_url+"' data-id='"+userId+"'>"+a_title+"</a></strong></td>"+
+                                                        "<td><strong>"+nickname"+</strong></td>"+
+                                                        "<td><strong>"+date+"</strong></td></tr>"+
+                                                        "<td><span class='label label-warning delete_a'>删除</span></td>";
                         $(".pageView").append(pageNotes);
                         $(".delete_a").on('click',disagreeArticle);
                         $(".close").trigger('click');
