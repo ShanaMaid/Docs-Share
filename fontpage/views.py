@@ -17,17 +17,18 @@ def adminIndex(request):
 	message={}
 	if request.session.get('u_account',False):
 		log_type=Roletable.objects.get(usertable__u_account=request.session['u_account'])
-		pageList=getSubmitPage()
+		nickname=Usertable.objects.get(u_account=request.session['u_account']).u_nickname
+		pageList=getSubmitPage(request)
 		if log_type.r_type=='manager':
 			personList=PersonList(log_type.r_type)
 			groupList=getGroup()
-			#print pageList
-			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList,'groupList':groupList})
+			print pageList
+			return render(request,'fontpage/manager.html',{'account':request.session['u_account'],'nickname':nickname,'message':message,'pageList':pageList,'personList':personList,'groupList':groupList})
 		elif log_type.r_type=='headman':
 			personList=PersonList(log_type.r_type)
-			return render(request,'fontpage/headman.html',{'account':request.session['u_account'],'message':message,'pageList':pageList,'personList':personList})
+			return render(request,'fontpage/headman.html',{'account':request.session['u_account'],'nickname':nickname,'message':message,'pageList':pageList,'personList':personList})
 		else:
-			return render(request,'fontpage/member.html',{'account':request.session['u_account'],'pageList':pageList,'message':message})
+			return render(request,'fontpage/member.html',{'account':request.session['u_account'],'nickname':nickname,'pageList':pageList,'message':message})
 	else:
 		return render(request,'fontpage/login.html')
 @csrf_exempt
@@ -36,6 +37,8 @@ def deleteArticle(request):
 	if request.is_ajax():
 		a_title=request.POST.get('a_title')
 		u_account=request.POST.get('u_account')
+		print a_title
+		print u_account
 		try:
 			det_article=Article.objects.get(a_title=a_title)
 			mod_user=Usertable.objects.get(u_account=u_account)
@@ -263,16 +266,16 @@ def test(request):
 	return render(request,'fontpage/test.html')
 		
 
-def getSubmitPage():
+def getSubmitPage(request):
 	result={}
 	try:
 		a_account=request.session['u_account']
 		a_group=Usergroup.objects.get(usertable__u_account=a_account)
-		content=Article.objects.filter(g=a_group)
+		pagecontent=Article.objects.filter(g=a_group)
 	except Exception as e:
 		print e
 	result['ret_code']=0
-	JsonContent=serializers.serialize("json", content)
+	JsonContent=serializers.serialize("json", pagecontent)
 	result['content']=json.loads(JsonContent)
 	result['ret_msg']=''
 	try:
